@@ -11,6 +11,7 @@ import Cineplex.CineplexDatabase;
 import Movie.DateMovie;
 import Movie.Movie;
 import Movie.RatedMovie;
+import Movie.RatedMovieDatabase;
 
 public class UserApplication implements Serializable{
 	
@@ -34,7 +35,9 @@ public class UserApplication implements Serializable{
 	private static Customer customer;
 	private static ArrayList<DateMovie> movieScheduleList = new ArrayList<DateMovie>();
 	private static Movie movieChosen = new Movie();
-	private static RatedMovie ratedMovie;
+	private static RatedMovieDatabase ratedMovieDatabase = new RatedMovieDatabase();
+	private static ArrayList readMovie = ratedMovieDatabase.readFromDatabase("RatedMovie.dat");
+	private static RatedMovie ratedMovie = (RatedMovie)readMovie.get(0);
 	private static ArrayList<Customer> customerList = new ArrayList<Customer>();
 	
 	public static void main(String[] args) {			
@@ -109,7 +112,6 @@ public class UserApplication implements Serializable{
 					int timingChoice = requestInput(SELECT_TIMING_INTERFACE);			
 					
 					int ageGroup = requestInput(SELECT_AGE_GROUP_INTERFACE);
-					
 					double ticketPrice = movieChosen.getPrice(ageGroup);				
 					
 					requestInput(SELECT_SEAT);		
@@ -127,9 +129,6 @@ public class UserApplication implements Serializable{
 				case 5:
 					System.out.println("Select a movie to rate: ");
 					int ratingMovieChoice = requestInput(MOVIE_INTERFACE);
-					System.out.println("Give rating (1 - 5): ");
-					double rating = sc.nextDouble();
-					ratedMovie = new RatedMovie();	
 					break;
 					
 				case 6:
@@ -166,7 +165,7 @@ public class UserApplication implements Serializable{
 						+ "2) List the movies with details\n"
 						+ "3) Search for movies\n"
 						+ "4) Book ticket\n"
-						+ "5) Rate a movie\n"
+						+ "5) Rate and see the top movie\n"
 						+ "6) View your booking\n"
 						+ "7) Exit\n");
 										
@@ -251,7 +250,33 @@ public class UserApplication implements Serializable{
 					
 				}
 				*/
-				//print all 
+				//print all the movie from ratedmovie
+				
+				System.out.println("1) Top 5 Movie based on Rating");
+				System.out.println("2) Top 5 movie based on Ticket Sales");
+				System.out.println("3) Rate the movie");
+				int choiceOption = sc.nextInt();
+				switch(choiceOption){
+				case 1:
+					ratedMovie.printTopFiveMovieBasedOnRating();
+					break;
+				case 2:
+					ratedMovie.printTopFiveMovieBasedOnTicket();
+					break;
+				case 3:
+					ratedMovie.printTopFiveMovieBasedOnRating();
+					System.out.println("which movie you want to rate");
+					int movieRatedOption = sc.nextInt();
+					System.out.println("insert your rating here");
+					double rating = sc.nextDouble();
+					ratedMovie.updateMovieRating(movieRatedOption, rating);
+					
+					break;
+				}
+				ratedMovieDatabase.writeToDatabase("RatedMovie.dat",readMovie);
+				System.out.println("");
+				return 0;
+				
 				
 			case BOOKING_MAIN_INTERFACE:
 				String customerEmailAdd;
@@ -335,7 +360,7 @@ public class UserApplication implements Serializable{
 				
 			case SELECT_SEAT:
 				Cinema showingCinema = movieChosen.getArrayListOfDateMovie().get(0).getCinema();
-				boolean success = false;
+				boolean success = true;
 				System.out.println(showingCinema.getSeatArrangement());
 				System.out.println("Select seat from cinema layout above: ");
 				System.out.print("Row (A - J): ");
@@ -348,7 +373,7 @@ public class UserApplication implements Serializable{
 					System.out.println("Seat taken, please select again");
 					System.out.print("(To cancel, enter 'z') Row (A - J): ");
 					row = sc.next();
-					if(row.equals("c")){
+					if(row.equals("z")){
 						success = false;
 						break;
 					}
@@ -359,9 +384,9 @@ public class UserApplication implements Serializable{
 				
 				if (success == true){
 					
-					System.out.println("Successfully booked!");	
+					System.out.println("Successfully booked! movie name: "+movieChosen.getTitle());	
 					customer.assignSeat(row + Integer.toString(column));
-					
+					ratedMovie.updateMovieTicket(movieChosen.getTitle());
 					
 				}
 				
@@ -401,12 +426,9 @@ public class UserApplication implements Serializable{
 					
 				}
 				
-				ArrayList<String> temp = currentCustomer.getBookedMovieList();				
+				//ArrayList<String> temp = currentCustomer.getBookedMovieList();				
 				
-				
-				
-				
-				printBookedMovie(temp);
+			//	printBookedMovie(temp);
 				
 				return 0;
 				
@@ -478,7 +500,6 @@ public class UserApplication implements Serializable{
 	}
 	
 	private static boolean validateEmailAdd(String email){
-		
 		String ePattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$";
         java.util.regex.Pattern p = java.util.regex.Pattern.compile(ePattern);
         java.util.regex.Matcher m = p.matcher(email);
