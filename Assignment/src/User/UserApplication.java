@@ -10,6 +10,7 @@ import Cineplex.Cineplex;
 import Cineplex.CineplexDatabase;
 import Movie.DateMovie;
 import Movie.Movie;
+import Movie.RatedMovie;
 
 public class UserApplication implements Serializable{
 	
@@ -17,25 +18,26 @@ public class UserApplication implements Serializable{
 	
 	private static final int MAIN_MENU = 0;
 	private static final int CINEPLEX_INTERFACE = 1;
-	private static final int MOVIE_INTERFACE = 2;
+	private static final int MOVIE_INTERFACE_FOR_SELECTED_CINEPLEX = 2;
 	private static final int BOOKING_MAIN_INTERFACE = 3;
 	private static final int RATING_INTERFACE = 4;
 	private static final int SELECT_TIMING_INTERFACE = 5;
 	private static final int SELECT_AGE_GROUP_INTERFACE = 6;
 	private static final int SELECT_SEAT = 7;
+	private static final int MOVIE_INTERFACE = 8;
+	private static final int CHECK_MOVIE_INTERFACE = 9;
 	
 	private static CineplexDatabase userDatabase =  new CineplexDatabase();	
 	private static ArrayList <Cineplex> cineplexList = userDatabase.readFromDatabase("CineplexDatabase.dat");
 	private static Scanner sc = new Scanner(System.in);		
 	private static ArrayList <Movie> movieListForSpecificCineplex = new ArrayList<Movie>();
-	private static ArrayList <Movie> movieListForAllCineplex = new ArrayList<Movie>();
 	private static Customer customer;
 	private static ArrayList<DateMovie> movieScheduleList = new ArrayList<DateMovie>();
 	private static Movie movieChosen = new Movie();
+	private static RatedMovie ratedMovie;
+	private static ArrayList<Customer> customerList = new ArrayList<Customer>();
 	
-	public static void main(String[] args) {	
-		
-		createMovieList();
+	public static void main(String[] args) {			
 		
 		boolean carryOn = true;
 		
@@ -98,7 +100,7 @@ public class UserApplication implements Serializable{
 						
 					movieListForSpecificCineplex = cineplexList.get(cineplexChoice - 1).getMovieList();
 					
-					int movieChoice = requestInput(MOVIE_INTERFACE);					
+					int movieChoice = requestInput(MOVIE_INTERFACE_FOR_SELECTED_CINEPLEX);					
 					
 					movieChosen = movieListForSpecificCineplex.get(movieChoice - 1);
 					
@@ -118,17 +120,22 @@ public class UserApplication implements Serializable{
 					String confirmation = sc.next();
 					
 					if(confirmation.equals("y") || confirmation.equals("Y"))
-						displayTicket(timingChoice);
-					
+						displayTicket(timingChoice);					
 					
 					break;
 				
 				case 5:
 					System.out.println("Select a movie to rate: ");
-					requestInput(MOVIE_INTERFACE);
-					
+					int ratingMovieChoice = requestInput(MOVIE_INTERFACE);
+					System.out.println("Give rating (1 - 5): ");
+					double rating = sc.nextDouble();
+					ratedMovie = new RatedMovie();	
+					break;
 					
 				case 6:
+					requestInput(CHECK_MOVIE_INTERFACE);
+					
+				case 7:
 					System.exit(0);
 					
 
@@ -160,13 +167,14 @@ public class UserApplication implements Serializable{
 						+ "3) Search for movies\n"
 						+ "4) Book ticket\n"
 						+ "5) Rate a movie\n"
-						+ "6) Exit\n");
+						+ "6) View your booking\n"
+						+ "7) Exit\n");
 										
 				if (sc.hasNextInt()){
 					
 					int choice = sc.nextInt();
 					
-					while (choice >= 7){
+					while (choice >= 8){
 						
 						System.out.println("Invalid Option, choose again: ");
 						choice = sc.nextInt();
@@ -201,7 +209,7 @@ public class UserApplication implements Serializable{
 					
 				}
 				
-			case MOVIE_INTERFACE:
+			case MOVIE_INTERFACE_FOR_SELECTED_CINEPLEX:
 				System.out.println("Choose movie:");
 				
 				for (int i = 0; i < movieListForSpecificCineplex.size(); i++){
@@ -221,6 +229,29 @@ public class UserApplication implements Serializable{
 					return choice;
 					
 				}
+				
+			case MOVIE_INTERFACE:
+				/*System.out.println("Choose movie:");
+				
+				for (int i = 0; i < movieListForAllCineplex.size(); i++){
+				
+					System.out.printf("%d) ", i + 1);
+					System.out.println(movieListForAllCineplex.get(i).getTitle());
+				
+				}
+				if (sc.hasNextInt()){
+					
+					int choice = sc.nextInt();
+					while (choice >= movieListForAllCineplex.size() + 1){
+						
+						System.out.println("Invalid Option, choose again: ");
+						choice = sc.nextInt();
+					}
+					return choice;
+					
+				}
+				*/
+				//print all 
 				
 			case BOOKING_MAIN_INTERFACE:
 				String customerEmailAdd;
@@ -304,6 +335,7 @@ public class UserApplication implements Serializable{
 				
 			case SELECT_SEAT:
 				Cinema showingCinema = movieChosen.getArrayListOfDateMovie().get(0).getCinema();
+				boolean success = false;
 				System.out.println(showingCinema.getSeatArrangement());
 				System.out.println("Select seat from cinema layout above: ");
 				System.out.print("Row (A - J): ");
@@ -314,16 +346,67 @@ public class UserApplication implements Serializable{
 				while(!showingCinema.requestSeat(row, column)){
 					
 					System.out.println("Seat taken, please select again");
-					System.out.print("Row (A - J): ");
+					System.out.print("(To cancel, enter 'z') Row (A - J): ");
 					row = sc.next();
+					if(row.equals("c")){
+						success = false;
+						break;
+					}
 					System.out.print("Column (1 - 10): ");
 					column = sc.nextInt();
 					
 				}
 				
-				System.out.println("Successfully booked!");				
+				if (success == true){
+					
+					System.out.println("Successfully booked!");	
+					customer.assignSeat(row + Integer.toString(column));
+					
+					
+				}
 				
-				customer.assignSeat(row + Integer.toString(column));
+				else {
+					
+					System.out.println("Cancelled");
+					
+				}
+				
+				
+				
+				return 0;
+				
+			case CHECK_MOVIE_INTERFACE:
+				System.out.println("Enter your email address: ");
+				do{					
+					
+					customerEmailAdd = sc.next();
+					
+					if(validateEmailAdd(customerEmailAdd) == false)						
+						System.out.println("Invalid email address, enter again: ");						
+					
+					else break;
+					
+				}while (true);
+				
+				Customer currentCustomer = null;
+				
+				for(int i = 0; i < customerList.size(); i++){
+					
+					if(customerList.get(i).getEmailAdd().equals(customerEmailAdd)){
+						
+						currentCustomer = customerList.get(i);
+						break;
+						
+					}
+					
+				}
+				
+				ArrayList<String> temp = currentCustomer.getBookedMovieList();				
+				
+				
+				
+				
+				printBookedMovie(temp);
 				
 				return 0;
 				
@@ -333,6 +416,19 @@ public class UserApplication implements Serializable{
 		
 	}
 	
+	private static void printBookedMovie(ArrayList<String> temp) {
+		
+		System.out.println("Your booked movie(s): ");
+		
+		for (int i = 0; i < temp.size(); i++){
+			
+			System.out.printf("%d: ", i);
+			System.out.println(temp.get(i));
+			System.out.println("Show time: ");
+		}		
+		
+	}
+
 	private static void listMovies(boolean withDetails, int cineplex){
 		
 		if (cineplex == 0) {
@@ -390,35 +486,5 @@ public class UserApplication implements Serializable{
 		
 	}
 		
-	private static void createMovieList(){
-		
-		for(int i = 0; i < cineplexList.size(); i++){
-			Cineplex currentCineplex = cineplexList.get(i);
-			for (int j = 0; j < currentCineplex.getMovieList().size(); j++){
-				int k = movieListForAllCineplex.size();
-				if(k > 0){
-					while(k > 0){					
-						
-						if(currentCineplex.getMovieList().get(j).getTitle().equals(movieListForAllCineplex.get(k-1).getTitle())){
-							
-							break;
-							
-						}
-						
-						k--;
-						
-					}
-				}
-				if(k == 0){
-				
-					movieListForAllCineplex.add(cineplexList.get(i).getMovieList().get(j));
-					System.out.println(cineplexList.get(i).getMovieList().get(j).getTitle());
-					
-				}
-				
-			}
-		}
-		
-	}
 	
 }
