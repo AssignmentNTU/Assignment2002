@@ -58,6 +58,7 @@ public class CineplexDatabase implements Database{
 		
 		
 		AMKHub.addMovie(theWalk);
+		
 		/*****************************************JEM**************************************************************/
 		Cinema firstCinemaJem = new Cinema("Room1");
 		Cinema secondCinemaJem = new Cinema("Room2");
@@ -84,7 +85,11 @@ public class CineplexDatabase implements Database{
 				+ "But the item Belial seeks is hidden in the last place anyone has thought to look…and seeming friends are not at all what they seem.");
 		
 		Jem.addMovie(LastWitchHunter);
-		
+		Jem.addMovie(LastWitchHunter);
+		Jem.addMovie(LastWitchHunter);
+		Jem.addMovie(LastWitchHunter);
+		Jem.addMovie(LastWitchHunter);
+		AMKHub.addMovie(LastWitchHunter);
 		//implementation of the movie list will be added later by StaffApplication
 		
 		/*****************************************WestMall********************************************************/
@@ -102,6 +107,8 @@ public class CineplexDatabase implements Database{
 		listCineplex.add(AMKHub);
 		listCineplex.add(Jem);
 		listCineplex.add(WestMall);
+		WestMall.addMovie(LastWitchHunter);
+		WestMall.addMovie(LastWitchHunter);
 		
 		
 		CineplexDatabase cDatabase =  new CineplexDatabase();
