@@ -3,6 +3,7 @@ package User;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Scanner;
 
@@ -16,12 +17,14 @@ public class Customer implements Serializable{
 	private String transactionId = "";
 	private int age;
 	private String seat;
+	private ArrayList<String> bookedMovieList;
 	
 	public Customer(String name, int phoneNumber, String emailAdd){
 		
 		this.name = name;
 		this.phoneNumber = phoneNumber;
 		this.emailAdd = emailAdd;
+		bookedMovieList = new ArrayList<String>();
 		
 	}
 	
@@ -89,6 +92,18 @@ public class Customer implements Serializable{
 	public String getSeat(){
 		
 		return seat;
+		
+	}
+	
+	public void addToBookedMovie(String bookedMovie){
+		
+		bookedMovieList.add(bookedMovie);
+		
+	}
+
+	public ArrayList<String> getBookedMovieList(){
+		
+		return bookedMovieList;
 		
 	}
 	
