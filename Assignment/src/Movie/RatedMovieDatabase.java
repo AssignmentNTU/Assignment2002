@@ -19,15 +19,15 @@ public class RatedMovieDatabase implements Database{
 		String fileName = "RatedMovie.dat";
 		ArrayList listMovie = new ArrayList<RatedMovie>();
 		//example for movie rating 
-		Movie first = new Movie("TheWalk",10);
-		Movie second= new Movie("LastWitchHunter",10);
+		Movie first = new Movie("The walk",10);
+		Movie second= new Movie("Last Witch Hunter",10);
 		RatedMovie ratedmovie = new RatedMovie();
 		ratedmovie.addMovieList(first);
 		ratedmovie.addMovieList(second);
 		listMovie.add(ratedmovie);
 		database.writeToDatabase(fileName, listMovie);
 		//after put it into the database try to read it
-		
+		/*
 		while(true){
 			ArrayList readMovie = database.readFromDatabase(fileName);
 			RatedMovie ratedMovie = (RatedMovie) readMovie.get(0);
@@ -44,7 +44,7 @@ public class RatedMovieDatabase implements Database{
 			//System.out.println("name: "+ratedMovie1.getMovieWithIndex(0).getTitle()+" rating: "+ratedMovie1.getMovieWithIndex(0).getRating());
 			database.writeToDatabase(fileName, readMovie);
 		}
-		
+		*/
 	}
 	
 	@Override
