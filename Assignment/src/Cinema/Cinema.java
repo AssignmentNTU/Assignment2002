@@ -14,7 +14,7 @@ public class Cinema implements Serializable{
 	private String type = ""; 
 	private ArrayList<Ticket> ticketList = new ArrayList<Ticket>();
 	private CinemaSeat[][] seatArray = new CinemaSeat[10][10];
-	private int emptySeatLeft;
+	public int emptySeatLeft;
 	private String theaterType;
 	
 	public static void main(String[] args) {
@@ -49,8 +49,6 @@ public class Cinema implements Serializable{
 			}		
 			
 		}
-		
-		seatArray[0][0].setOccupied(true);
 		
 	}
 
@@ -91,47 +89,61 @@ public class Cinema implements Serializable{
 				+ "\t\t   |           Screen           |\n"
 				+ "\t\t   |____________________________|\n";
 		
-		result += "\n    ___________________________________________________________\n";
+		result += "\n    ___________     ___________________________________     ___________\n";
 				
 		for (row = 0; row < 10; row++){			
 			result += seatArray[row][column].getRow();
 			
 			for (int j = 0; j < 10; j++){
 				
-				if (seatArray[row][j].isOccupied())
-					result += "  |  X";					
-				else 
-					result += "  |   ";
+				if(j > 7){
+					if (seatArray[row][j].isOccupied())
+						result += "  | X ";					
+					else
+						result += "  |   ";
+				}
+				else if (j > 2 && j < 8){
+					if (seatArray[row][j].isOccupied())
+						result += "   | X";					
+					else 
+						result += "   |  ";
+					if (j == 7)
+						result += "   | ";
+				}
+				else{
+					
+					if (seatArray[row][j].isOccupied())
+						result += "  |  X";					
+					else 
+						result += "  |   ";
+					if (j == 2)
+						result += "|  ";
+					
+				}
 				
 				
 			}
 			result += "  |";
-			result += "\n   |_____|_____|_____|_____|_____|_____|_____|_____|_____|_____|\n";
+			result += "\n   |_____|_____|   |_____|_____|_____|_____|_____|_____|   |_____|_____|\n";
 			
 		}
 		
 		result += "\n "
 				+ "     1"
 				+ "     2"
-				+ "     3"
+				+ "         3"
 				+ "     4"
 				+ "     5"
 				+ "     6"
 				+ "     7"
-				+ "     8"
-				+ "     9"
-				+ "     10";
+				+ "     8 "
+				+ "       9"
+				+ "      10";
 		
 		return result;
 		
 	}
-	
-//	public String getSeat(){
-//		
-//		return seat.getSeatId();
-//		
-//	}
-	
+		
 	public boolean requestSeat(String row, int column){
 		
 		switch(row){
