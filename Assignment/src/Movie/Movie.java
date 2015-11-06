@@ -2,19 +2,22 @@ package Movie;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class Movie implements Serializable{
 	
 	private String title = "";
 	private String duration="";
 	private String ratingPG;
-	private double rating = 0; 			//control by user not staff
+	private double totalRating = 0; 			//control by user not staff
+	private int counterRating = 0 ;
 	private double price = 0;
 	private String genre = "";
 	private String director = "";
 	private ArrayList<String> castList = new ArrayList<String>();
 	private String synopsis = "";
 	private ArrayList<DateMovie> scheduleMovie = new ArrayList<DateMovie>();
+	private int totalTicketSales = 0 ;
 	
 	
 	public static void main(String args[]){
@@ -32,9 +35,20 @@ public class Movie implements Serializable{
 		System.out.println(movie.printSynopsis());
 		System.out.println(movie.printCast());
 	}
+	//constrouctor for testing
 	public Movie(){
 		
 	}
+	
+	public Movie(String title, float rating){
+		this.title = title;
+		this.totalRating = rating;
+		this.counterRating++;
+	}
+	
+	//constructor for 
+	
+	
 	
 	public Movie(String title, String duration , String ratingPG , String genre,
 			DateMovie datemovie,double price,String director,ArrayList<String> listCast,String synopsis){
@@ -57,6 +71,15 @@ public class Movie implements Serializable{
 	public String getDirector(){
 		return director;
 	}
+	//getter and setter for ticket sales
+	public void increaseTicket(){
+		totalTicketSales++;
+	}
+	
+	public int getTicketSales(){
+		return totalTicketSales;
+	}
+	
 	
 	//getter and setter for synopsis
 	
@@ -141,12 +164,17 @@ public class Movie implements Serializable{
 	//getter and setter for rating 
 	
 	public void setRating(double rating){
-		this.rating= rating;
+		this.totalRating+= rating;
+		this.counterRating++;
 	}
 	
 	public double getRating(){
-		return rating;
+		//total point divide by the total voter
+		double averageRating = totalRating/counterRating;
+		return averageRating;
 	}
+	
+	
 	
 	
 	//getter and setter for genre
@@ -177,6 +205,8 @@ public class Movie implements Serializable{
 	}
 	
 	//getter and setter for price
+
+	//getter and setter for price
 	public void setPrice(double price){
 		this.price = price;
 	}
@@ -193,6 +223,7 @@ public class Movie implements Serializable{
 		}
 		return price;
 	}
+	
 	
 	//getting array of dateMovie
 	public ArrayList<DateMovie> getArrayListOfDateMovie(){
@@ -272,52 +303,12 @@ public class Movie implements Serializable{
 	}
 	
 	//with rating
-	public String printFullDescription(){
-		String movieDescription = "Title Movie: "+this.title+"\n"
-						   +"Duration: "+this.duration+ "\n"
-						   +"RatingPG: "+this.ratingPG+"\n"
-						   +"Genre: "+this.genre+"\n"
-						   +"Price: "+this.price+"\n"
-						   +"Director: "+this.director+"\n"
-						   +"cast: "+printCast()+"\n"
-						   +"Synopsis: "+printSynopsis()+"\n"
-						   +"Schedule Movie: \n\n";
-		String listTime = "";
-		//to display the schedule first we are going to sorted the schedule first 
-		//sorting using insertion sort
-		for(int i = 1 ; i < scheduleMovie.size() ; i++){
-			for(int j = i ; j > 0 ; j--){
-				DateMovie buffer;
-				if(scheduleMovie.get(j).compareTo(scheduleMovie.get(j-1)) == -1){
-					buffer = scheduleMovie.get(j);
-					scheduleMovie.set(j, scheduleMovie.get(j-1));
-					scheduleMovie.set(j-1,buffer);
-				}else{
-					break;
-				}
-			}
-			}
-		
-			for(int i = 0 ; i < scheduleMovie.size() ; i++){
-				if(i >= 1){
-					DateMovie current = scheduleMovie.get(i);
-					DateMovie before = scheduleMovie.get(i-1);
-				if(!((current.getYear() == before.getYear()) && (current.getMonth() == before.getMonth()) 
-						&& (current.getDay() == before.getDay()))){
-						String bannerDate = "----------"+current.getYearMonthDay()+"----------\n";
-						listTime+=bannerDate;
-				}
-				}else{
-					String bannerDate = "----------"+scheduleMovie.get(0).getYearMonthDay()+"----------\n";
-					listTime+=bannerDate;
-				}
-				listTime += scheduleMovie.get(i).getStatusTimeMovie()+"\n";
-			}
-		
-			movieDescription+=listTime;
-			movieDescription+="\nRating: "+this.rating+"\n";
+	public String printFullDescription(){	
+			String movieDescription = printDescription();
+			movieDescription+="\nRating: "+this.totalRating+"\n";
 		
 		return movieDescription;
 	}
 
+	//////////////////////////////////
 }
