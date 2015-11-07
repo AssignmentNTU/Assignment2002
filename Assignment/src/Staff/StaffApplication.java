@@ -57,13 +57,13 @@ public class StaffApplication {
 		
 		if(staffStatus){
 			System.out.println("welcome Staff\n");
-			ViewCinemaFromDatabase();
+			viewCinemaFromDatabase();
 		}else{
 			System.out.println("Sorry your username and password is not match with our database");
 		}
 	}
 	
-	private static void ViewCinemaFromDatabase(){
+	private static void viewCinemaFromDatabase(){
 		cDatabase = new CineplexDatabase();
 		cineplexList = new ArrayList<Cineplex>();
 		cineplexList = cDatabase.readFromDatabase("CineplexDatabase.dat");
@@ -78,7 +78,7 @@ public class StaffApplication {
 		if(choices > cineplexList.size()){
 			System.out.println("Sorry your cineplex option is invalid");
 			System.out.println("Please choose another option");
-			ViewCinemaFromDatabase();
+			viewCinemaFromDatabase();
 			return;
 		}
 		if(choices == -1){
@@ -88,7 +88,7 @@ public class StaffApplication {
 		
 		currentCineplex = cineplexList.get(choices-1);
 		try{
-			Configuring();
+			configuring();
 		}catch(ChoiceException e){
 			System.out.println(e.getMessage());
 			System.out.println("Please choose the below option");
@@ -99,7 +99,7 @@ public class StaffApplication {
 				System.out.println("Quitting process");
 				return;
 			}else{
-				ViewCinemaFromDatabase();
+				viewCinemaFromDatabase();
 			}
 		}catch(IndexOutOfBoundsException e){
 			System.out.println("Your index choice is invalid ");
@@ -107,7 +107,7 @@ public class StaffApplication {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private static void Configuring() throws ChoiceException {
+	private static void configuring() throws ChoiceException {
 		//get Movie from cineplex
 		while(true){
 			System.out.println("------------------------");
@@ -127,19 +127,19 @@ public class StaffApplication {
 					ConfigureHoliday();
 					break;
 				case 2:
-					UpdatingMovie();
+					updatingMovie();
 					break;
 				case 3:
 					addMovie();
 					break;
 				case 4:
-					RemoveMovie();
+					removeMovie();
 					break;
 				case 5:
 					getMovieList();
 					break;
 				case 6:
-					ViewCinemaFromDatabase();
+					viewCinemaFromDatabase();
 					return;
 				case 7:
 					System.out.println("Please choose the option below");
@@ -147,7 +147,7 @@ public class StaffApplication {
 					System.out.println("2) Quit from system");
 					int option = scan.nextInt();
 					if(option == 1){
-						ViewCinemaFromDatabase();
+						viewCinemaFromDatabase();
 					}else if(option == 2){
 						System.out.println("Quitting from system");
 					}
@@ -206,7 +206,7 @@ public class StaffApplication {
 		}
 	}
 	
-	private static void UpdatingMovie(){
+	private static void updatingMovie(){
 		System.out.println("\n------------------------\n");
 		System.out.println("List movie of "+currentCineplex.getCineplexName()+"............");
 		for(int i = 0 ; i < currentCineplex.getMovieList().size() ; i++){
@@ -219,7 +219,7 @@ public class StaffApplication {
 		if(indexMovie > currentCineplex.getMovieList().size()){
 			System.out.println("Sorry your movie option is invalid");
 			System.out.println("Please choose again");
-			UpdatingMovie();
+			updatingMovie();
 			return;
 		}
 		currentMovie = currentCineplex.getMovie(indexMovie-1);
@@ -323,7 +323,7 @@ public class StaffApplication {
 					currentMovie.setSynopsis(synopsis);
 					break;	
 				case 9:
-					ConfiguringDate();
+					configuringDate();
 					break;
 				default:
 					System.out.println("Sorry your choice is not listed in our system");
@@ -335,7 +335,7 @@ public class StaffApplication {
 						return;
 					}else if(option == 2){
 						System.out.println("");
-						UpdatingMovie();
+						updatingMovie();
 						return;
 					}
 					
@@ -384,7 +384,7 @@ public class StaffApplication {
 	
 	}
 	
-	public static void RemoveMovie(){
+	public static void removeMovie(){
 		System.out.println("\n------------------------\n");
 		System.out.println("List movie of "+currentCineplex.getCineplexName()+"............");
 		for(int i = 0 ; i < currentCineplex.getMovieList().size() ; i++){
@@ -423,7 +423,7 @@ public class StaffApplication {
 		}
 	}
 	
-	private static void ConfiguringDate(){
+	private static void configuringDate(){
 		//getting the list of date on the currentMovie
 		System.out.flush();
 		System.out.println("Please choose one option");
@@ -433,7 +433,7 @@ public class StaffApplication {
 		if(addDate == 1){
 			setNewDateOfMovie(currentMovie);
 		}else if(addDate == 2){
-			EditStatusTimeCinema();
+			editStatusTimeCinema();
 		}else{
 			System.out.println("Sorry your choice is not listed in our system");
 			System.out.println("Please choose the below option");
@@ -444,13 +444,13 @@ public class StaffApplication {
 				return;
 			}else if(option == 2){
 				System.out.println("");
-				ConfiguringDate();
+				configuringDate();
 				return;
 			}
 		}
 	}
 		
-	private static void EditStatusTimeCinema(){
+	private static void editStatusTimeCinema(){
 		System.out.println("Schedule "+currentMovie.getTitle()+" :");
 		currentMovie.getListDateStatusMovie();
 		System.out.println("\n");
@@ -485,7 +485,7 @@ public class StaffApplication {
 				return;
 			}else if(option == 2){
 				System.out.println("");
-				EditStatusTimeCinema();
+				editStatusTimeCinema();
 				return;
 			}
 			return ;
@@ -496,7 +496,7 @@ public class StaffApplication {
 		int year,month,day,hour,minute;
 		DateMovie dateMovie;
 		String status;
-		System.out.println("insert the date with format");
+		System.out.println("insert the date: ");
 		System.out.print("Year: ");
 		year = scan.nextInt();
 		System.out.print("Month: ");
