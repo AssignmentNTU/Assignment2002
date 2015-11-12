@@ -45,12 +45,11 @@ public class Cinema implements Serializable{
 			for(int j = 0; j < 10; j++){
 				
 				seatArray[i][j] = new CinemaSeat(i + 1, j + 1, false);
-				
-			}		
-			
+			}			
 		}
-		
 	}
+	
+	
 
 	
 	public Cinema(String cinemaName){
@@ -58,13 +57,10 @@ public class Cinema implements Serializable{
 		emptySeatLeft = 100;
 		for(int i = 0; i < 10; i++){
 			for(int j = 0; j < 10; j++){
-				
 				seatArray[i][j] = new CinemaSeat(i + 1, j + 1, false);
-				
 			}		
 			
-		}			
-				
+		}					
 	}
 	
 	//getter and setter for cinemaName
@@ -78,6 +74,18 @@ public class Cinema implements Serializable{
 		return this.cinemaName;
 		
 	}
+	
+	//getter and setter for the class type
+	
+	public void setCinemaClass(String theaterType){
+		this.theaterType = theaterType;
+	}
+	
+	
+	public String getTheaterType(){
+		return this.theaterType;
+	}
+	
 			
 	public String getSeatArrangement(){
 		
