@@ -14,9 +14,10 @@ public class Cineplex implements Serializable{
 	private String cineplexName="";
 	private int cinemaSize = 0;
 	private ArrayList<Cinema> cinemaList = new ArrayList<Cinema>();
-	public ArrayList<DateMovie> holidayList = new ArrayList<DateMovie>();
 	private ArrayList<Movie> movieList = new ArrayList<Movie>();
+	public ArrayList<Movie> ratingMovieList = new ArrayList<Movie>();
 
+	//we have 2 option here using 1 more movie list again or 
 	//constructor
 	
 	public Cineplex(){
@@ -29,6 +30,49 @@ public class Cineplex implements Serializable{
 	
 	//end of constructor
 	
+	//add and remove from movieRating
+	public  ArrayList<Movie> getMovieRatingList(){
+		return ratingMovieList;
+	}
+	
+	public void addMovieForRating(Movie movie){
+		for(int i = 0 ; i < ratingMovieList.size() ; i++){
+			if(movie.getTitle().equals(ratingMovieList.get(i).getTitle())){
+				System.out.println("returning");
+				return;
+			}
+		}
+		ratingMovieList.add(movie);
+	}
+	
+	public Movie getMovieRating(int index){
+		return ratingMovieList.get(index);
+	}
+	
+	public void addRatingForSpecificMovie(int index,double rating){
+		ratingMovieList.get(index).setRating(rating);
+	}
+	
+	public void removeMovieForRating(Movie movie){
+		ratingMovieList.remove(movie);
+	}
+	
+	public void topFiveMovieBasedOnRating(){
+		if(ratingMovieList.size() > 1){
+			for(int i = 1 ; i < ratingMovieList.size() ; i++){
+				double rating = ratingMovieList.get(i-1).getRating();
+				double rating1 = ratingMovieList.get(i).getRating();
+				if(rating < rating1){
+					Movie bufferMovie = ratingMovieList.get(i-1);
+					ratingMovieList.set(i-1,ratingMovieList.get(i));
+					ratingMovieList.set(i, bufferMovie);
+				}
+			}
+		}
+		for(int i = 0 ; i < ratingMovieList.size() && i <= 5 ; i++){
+			System.out.printf("%d) Title: %s\n,  Rating: %f",i+1,this.ratingMovieList.get(i).getTitle(),this.getMovieRating(i).getRating());
+		}
+	}
 	
 	//add and remove  movie 
 	public void addMovie(Movie movie){
@@ -75,31 +119,39 @@ public class Cineplex implements Serializable{
 			}
 		}
 	}
+
+	public static void printMovieForUser(ArrayList<Movie> bufferMoviePreview){
+		for(int i = 0 ; i < bufferMoviePreview.size()  ;i++){
+			System.out.println("---------------------------------------------------");
+			System.out.println(i+1+")");
+			System.out.println(bufferMoviePreview.get(i).printMovieListingUser());
+			System.out.print("\nStatus of Movie: ");
+			String status = bufferMoviePreview.get(i).getArrayListOfDateMovie().get(0).getStatus();
+			if(!status.equals("End of Showing")){
+				status = "Now Showing";
+			}
+			System.out.println(status);	
+			System.out.println("---------------------------------------------------");
+		}
+	}
 	
-	public void listMovie(boolean withDetails){
+	
+	public void listMovie(){
 		
 		if(movieList.size() == 0) return;
-		
-		if (withDetails){
-			
-			for (int i = 0; i < movieList.size(); i++){
-				
-				System.out.println(movieList.get(i).printDescription());
-				
-			}
-			
-		}
-		else{
-			
+		{
 			for (int i = 0; i < movieList.size(); i++){
 				
 				System.out.printf("%d) ", i + 1);
 				System.out.println(movieList.get(i).getTitle());
 				
 			}
-			
 		}	
-		
 	}
+	
+	
+	
+	
+	
 	
 }
