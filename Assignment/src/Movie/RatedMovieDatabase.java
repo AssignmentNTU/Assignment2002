@@ -15,17 +15,23 @@ import Interface.Database;
 public class RatedMovieDatabase implements Database{
 	
 	public static void main(String[] args){
+		System.out.println("Start Constructing the original database for Rated Movie");
 		RatedMovieDatabase database = new RatedMovieDatabase();
 		String fileName = "RatedMovie.dat";
 		ArrayList listMovie = new ArrayList<RatedMovie>();
 		//example for movie rating 
-		Movie first = new Movie("The walk",10);
-		Movie second= new Movie("Last Witch Hunter",10);
+		Movie first = new Movie("The walk");
+		Movie second= new Movie("Last Witch Hunter");
+		Movie third = new Movie("Paranormal Activity The Ghost Dimension");
+		Movie fourth = new Movie("Goosebumps");
 		RatedMovie ratedmovie = new RatedMovie();
 		ratedmovie.addMovieList(first);
 		ratedmovie.addMovieList(second);
+		ratedmovie.addMovieList(third);
+		ratedmovie.addMovieList(fourth);
 		listMovie.add(ratedmovie);
 		database.writeToDatabase(fileName, listMovie);
+		System.out.println("Finish construction the original database for Rated Movie");
 		//after put it into the database try to read it
 		/*
 		while(true){
