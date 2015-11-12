@@ -1,6 +1,7 @@
 package Staff;
 
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 import Cinema.Cinema;
@@ -8,6 +9,7 @@ import Cineplex.ChoiceException;
 import Cineplex.Cineplex;
 import Cineplex.CineplexDatabase;
 import Movie.DateMovie;
+import Movie.HolidayDataBase;
 import Movie.Movie;
 import Movie.RatedMovie;
 import Movie.RatedMovieDatabase;
@@ -23,9 +25,13 @@ public class StaffApplication {
 	private static CineplexDatabase cDatabase;
 	private static Scanner scan = new Scanner(System.in);
 	private static RatedMovieDatabase ratedMovieDatabase = new RatedMovieDatabase();
+	private static HolidayDataBase holidayDatabase = new HolidayDataBase();
 	@SuppressWarnings("rawtypes")
 	private static ArrayList listRatedMovie = ratedMovieDatabase.readFromDatabase("RatedMovie.dat");
+	@SuppressWarnings({ "rawtypes" })
+	private static ArrayList listHoliday = holidayDatabase.readFromDatabase("HolidayDatabase.dat");
 	private static RatedMovie movieRated = (RatedMovie)listRatedMovie.get(0);
+	
 	
 	public static void main(String args[]){
 		//declare all the object 
@@ -74,7 +80,8 @@ public class StaffApplication {
 		}
 		System.out.println("------------------------");
 		System.out.println("\n\nPlease choose one Cineplex from Cathay Cineplex to configure or type -1 to quit");
-		int choices = scan.nextInt();
+		try{
+			int choices = scan.nextInt();
 		if(choices > cineplexList.size()){
 			System.out.println("Sorry your cineplex option is invalid");
 			System.out.println("Please choose another option");
@@ -103,6 +110,44 @@ public class StaffApplication {
 			}
 		}catch(IndexOutOfBoundsException e){
 			System.out.println("Your index choice is invalid ");
+			e.printStackTrace();
+			System.out.println("Please choose the below option");
+			System.out.println("1) Quit");
+			System.out.println("2) Configure again");
+			int option = scan.nextInt();
+			if(option == 1){
+				System.out.println("Quitting process");
+				return;
+			}else{
+				viewCinemaFromDatabase();
+			}
+		}catch(InputMismatchException e){
+			System.out.println("\nYour input is invalid\n");
+			System.out.println("Please choose the below option");
+			System.out.println("1) Quit");
+			System.out.println("2) Configure again");
+			int option = scan.nextInt();
+			if(option == 1){
+				System.out.println("Quitting process");
+				return;
+			}else{
+				viewCinemaFromDatabase();
+			}
+		}
+		}catch(Exception e){
+			e.printStackTrace();
+			System.out.println("sorry system undergo problem");
+			System.out.println("Please choose the below option");
+			System.out.println("1) Quit");
+			System.out.println("2) Configure again");
+			scan.nextLine();
+			int option = scan.nextInt();
+			if(option == 1){
+				System.out.println("Quitting process");
+				return;
+			}else{
+				viewCinemaFromDatabase();
+			}
 		}
 	}
 	
@@ -127,13 +172,25 @@ public class StaffApplication {
 					ConfigureHoliday();
 					break;
 				case 2:
-					updatingMovie();
+					if(currentCineplex.getMovieList().size() > 0){
+						updatingMovie();
+					}else{
+						System.out.println("Sorry there has no movie in "+currentCineplex.getCineplexName());
+					}
 					break;
 				case 3:
-					addMovie();
+					if(currentCineplex.getMovieList().size()> 0){
+						addMovie();
+					}else{
+						System.out.println("Sorry there has no movie in "+currentCineplex.getCineplexName());
+					}
 					break;
 				case 4:
-					removeMovie();
+					if(currentCineplex.getMovieList().size() > 0){
+						removeMovie();
+					}else{
+						System.out.println("Sorry there has no movie in "+currentCineplex.getCineplexName());
+					}
 					break;
 				case 5:
 					getMovieList();
@@ -157,9 +214,11 @@ public class StaffApplication {
 			}
 			cDatabase.writeToDatabase("CineplexDatabase.dat",cineplexList);
 			ratedMovieDatabase.writeToDatabase("RatedMovie.dat",listRatedMovie);
+			holidayDatabase.writeToDatabase("HolidayDatabase.dat",listHoliday);
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	private static void ConfigureHoliday(){
 		System.out.println("\n------------------------");
 		System.out.println("1) Add Holiday");
@@ -170,24 +229,25 @@ public class StaffApplication {
 		int holidayOption = scan.nextInt();
 		if(holidayOption == 1){
 			System.out.println("please specify ");
-			System.out.print("Year: ");
+			System.out.print("Year(yyyy): ");
 			int holidayYear = scan.nextInt();
-			System.out.print("Month: ");
+			System.out.print("Month(MM): ");
 			int holidayMonth = scan.nextInt();
-			System.out.print("Day: ");
+			System.out.print("Day(dd): ");
 			int holidayDay = scan.nextInt();
 			DateMovie holidayDate  = new DateMovie(holidayYear,holidayMonth,holidayDay);
 			System.out.println("Holiday on "+holidayDate.getYearMonthDay()+" has been set");
-			currentCineplex.holidayList.add(holidayDate);
+			listHoliday.add(holidayDate);
 		}else if(holidayOption == 2){
 			System.out.println("Holiday schedule of "+currentCineplex.getCineplexName());
 			int removeHoliday = getIndexHoliday();
-			currentCineplex.holidayList.remove(removeHoliday-1);
+			listHoliday.remove(removeHoliday-1);
 			System.out.println("changes has been saved to the system\n");
 		}else if(holidayOption == 3){
 			System.out.println("Holiday schedule of "+currentCineplex.getCineplexName());
-			for(int i = 0 ; i < currentCineplex.holidayList.size() ; i++){
-				System.out.printf("%d) %s",i+1,currentCineplex.holidayList.get(i).getYearMonthDay());
+			for(int i = 0 ; i < listHoliday.size() ; i++){
+				DateMovie holiday = (DateMovie)listHoliday.get(i);
+				System.out.printf("%d) %s\n",i+1,holiday.getYearMonthDay());
 			}
 			System.out.println("\n");
 		}else{
@@ -210,7 +270,7 @@ public class StaffApplication {
 		System.out.println("\n------------------------\n");
 		System.out.println("List movie of "+currentCineplex.getCineplexName()+"............");
 		for(int i = 0 ; i < currentCineplex.getMovieList().size() ; i++){
-			System.out.println(i+1);
+			System.out.println(i+1+")");
 			System.out.printf("%s\n",currentCineplex.getMovieList().get(i).printDescription());
 		}
 		System.out.println("\n------------------------\n");
@@ -248,7 +308,7 @@ public class StaffApplication {
 					currentMovie.setTitle(newTitle);
 					break;
 				case 2:
-					System.out.println("insert the new duration");
+					System.out.println("insert the new duration in minute");
 					scan.nextLine();
 					String newDuration = scan.nextLine();
 					currentMovie.setDuration(newDuration);
@@ -266,7 +326,7 @@ public class StaffApplication {
 					currentMovie.setGenre(newGenre);
 					break;
 				case 5:
-					System.out.println("insert the new price of the movie");
+					System.out.println("insert the new price of the movie in SGD");
 					scan.nextLine();
 					double price = scan.nextDouble();
 					currentMovie.setPrice(price);
@@ -287,7 +347,7 @@ public class StaffApplication {
 					System.out.println("Editting the cast");
 					System.out.println("1) add new cast");
 					System.out.println("2) Remove cast");
-					System.out.println("3) Add new List of cast");
+					System.out.println("3) Update new  List of cast");
 					
 					int optionCast = scan.nextInt();
 					if(optionCast == 1){
@@ -303,10 +363,15 @@ public class StaffApplication {
 					}else if(optionCast  == 3){
 						System.out.println("How many cast you want to add");
 						int castNumber = scan.nextInt();
+						while(castNumber < 2){
+							System.out.println("please choose at least 2");
+							System.out.println("How many cast you want to add(at least 2)");
+							castNumber = scan.nextInt();
+						}
 						ArrayList<String> castList = new ArrayList<String>(); 
 						scan.nextLine();
 						for(int i = 0 ; i < castNumber ; i++){
-							System.out.printf("name of cast %d",i+1);
+							System.out.printf("name of cast %d: ",i+1);
 							String cast = scan.nextLine();
 							castList.add(cast);
 						}
@@ -354,23 +419,29 @@ public class StaffApplication {
 		scan.nextLine();
 		System.out.println("insert the title of new movie");
 		title = scan.nextLine();
-		System.out.println("insert the duration of new movie");
+		System.out.println("insert the duration of new movie, duration in minute");
 		duration = scan.nextLine();
 		System.out.println("insert the genre of the new movie");
 		genre = chooseMovieType();
+		scan.nextLine();
 		System.out.println("insert the RatingPG");
 		ratingPG = scan.nextLine();
-		System.out.println("insert the price of the movie");
+		System.out.println("insert the price of the movie in SGD");
 		price = scan.nextDouble();
 		System.out.println("insert the director");
 		scan.nextLine();
 		String director = scan.nextLine();
-		System.out.println("How many cast you want to add");
+		System.out.println("How many cast you want to add(at least 2)");
 		int castNumber = scan.nextInt();
+		while(castNumber < 2){
+			System.out.println("please choose at least 2");
+			System.out.println("How many cast you want to add(at least 2)");
+			castNumber = scan.nextInt();
+		}
 		ArrayList<String> castList = new ArrayList<String>(); 
 		scan.nextLine();
 		for(int i = 0 ; i < castNumber ; i++){
-			System.out.printf("name of cast %d",i+1);
+			System.out.printf("name of cast %d: ",i+1);
 			String cast = scan.nextLine();
 			castList.add(cast);
 		}
@@ -388,7 +459,7 @@ public class StaffApplication {
 		System.out.println("\n------------------------\n");
 		System.out.println("List movie of "+currentCineplex.getCineplexName()+"............");
 		for(int i = 0 ; i < currentCineplex.getMovieList().size() ; i++){
-			System.out.println(i+1);
+			System.out.println(i+1+")");
 			System.out.printf("%s\n",currentCineplex.getMovieList().get(i).printDescription());
 		}
 		System.out.println("\n------------------------\n");
@@ -402,8 +473,8 @@ public class StaffApplication {
 		for(int i = 0 ; i < cineplexList.size() ; i++){
 			Cineplex cineplex = cineplexList.get(i);
 			ArrayList<Movie> movieRemovedList = cineplex.getMovieList();
-			for(int j = 0 ; j < movieRemovedList.size() && currentCineplex.getMovieList().size() > 0 ;j++){
-				if(movieRemovedList.get(i).getTitle().equals(movieDeleted)){
+			for(int j = 0 ; j < movieRemovedList.size() ;j++){
+				if(movieRemovedList.get(j).getTitle().equals(movieDeleted)){
 					//means still has this movie in other cineplex so cannot delete it
 					pass = false;
 					break;
@@ -497,26 +568,18 @@ public class StaffApplication {
 		DateMovie dateMovie;
 		String status;
 		System.out.println("insert the date: ");
-		System.out.print("Year: ");
+		System.out.print("Year(YYYY): ");
 		year = scan.nextInt();
-		System.out.print("Month: ");
+		System.out.print("Month(MM): ");
 		month = scan.nextInt();
-		System.out.print("Day: ");
+		System.out.print("Day(DD): ");
 		day = scan.nextInt();
-		System.out.print("Hour: ");
+		System.out.print("Hour(hh): ");
 		hour = scan.nextInt();
-		System.out.print("Minute: ");
+		System.out.print("Minute(mm): ");
 		minute = scan.nextInt();
 		scan.nextLine();
 		DateMovie checkHolidayDate = new DateMovie(year,month,day);
-		for(int i = 0 ; i< currentCineplex.holidayList.size() ; i++){
-			if(checkHolidayDate.getYearMonthDay().equals(currentCineplex.holidayList.get(i).getYearMonthDay())){
-				System.out.println("Sorry your new added date is on holiday");
-				System.out.println("please specify another date");
-				addDateOnNewMovie(title);
-				break;
-			}
-		}
 		System.out.println("insert the status of the movie on that time");
 		status = chooseStatusMovie();
 		System.out.println("insert the cinema that will be playing "+title+" on "+checkHolidayDate.getYearMonthDay());
@@ -538,17 +601,7 @@ public class StaffApplication {
 		int hour = scan.nextInt();
 		System.out.print("mm: ");
 		int minute = scan.nextInt();
-		boolean pass = true;
 		DateMovie datemovie = new DateMovie(year, month, day, hour, minute);
-		//check the date whether it is holiday or not
-		DateMovie checkHolidayDate = new DateMovie(year,month,day);
-		for(int i = 0 ; i< currentCineplex.holidayList.size() ; i++){
-			if(checkHolidayDate.getYearMonthDay().equals(currentCineplex.holidayList.get(i).getYearMonthDay())){
-				pass = false;
-				break;
-			}
-		}
-		if(pass){
 		System.out.println("insert status to this new Date "+datemovie.getTime());
 		scan.nextLine();
 		String newStatus = chooseStatusMovie();
@@ -559,11 +612,6 @@ public class StaffApplication {
 		datemovie.setCinema(cinema);
 		currentMovie.setTimeStatus(datemovie);
 		System.out.println("\nYour change has been saved to our system\n");
-		}else{
-			System.out.println("Sorry your new added date is on holiday");
-			System.out.println("please specify another date");
-			setNewDateOfMovie(chooseMovie);
-		}
 	}
 	
 	private static void editTime(DateMovie currentDate){
@@ -604,16 +652,6 @@ public class StaffApplication {
 				break;
 			
 			}
-			//checking whether the date that you just modified is holiday or not
-			DateMovie checkHolidayDate = new DateMovie(currentDate.getYear(),currentDate.getMonth(),currentDate.getDay());
-			for(int i = 0 ; i< currentCineplex.holidayList.size() ; i++){
-				if(checkHolidayDate.getYearMonthDay().equals(currentCineplex.holidayList.get(i).getYearMonthDay())){
-					System.out.println("Sorry your new added date is on holiday");
-					System.out.println("please specify another date");
-					editTime(currentDate);
-					return;
-				}
-			}
 			
 		}
 	
@@ -647,12 +685,13 @@ public class StaffApplication {
 	}
 	
 	private static int getIndexHoliday(){
-		for(int i = 0 ; i < currentCineplex.holidayList.size() ; i++){
-			System.out.printf("%d) %s",i+1,currentCineplex.holidayList.get(i).getYearMonthDay());
+		for(int i = 0 ; i < listHoliday.size() ; i++){
+			DateMovie holiday = (DateMovie)listHoliday.get(i);
+			System.out.printf("%d) %s\n",i+1,holiday.getYearMonthDay());
 		}
 		System.out.println("\nwhich holiday date you want to remove\n");
 		int removeHoliday = scan.nextInt();
-		if(removeHoliday > currentCineplex.holidayList.size()){
+		if(removeHoliday > listHoliday.size()){
 			System.out.println("Sorry your holiday option is invalid");
 			System.out.println("Please choose again");
 			return getIndexHoliday();
@@ -721,6 +760,7 @@ public class StaffApplication {
 				returnString = "3D";
 				break;
 			case 8:
+				scan.nextLine();
 				System.out.println("please insert the type of movie here");
 				returnString = scan.nextLine();
 				break;
@@ -730,308 +770,4 @@ public class StaffApplication {
 	}
 	
 
-	
-	/*
-	private static void Configuring(){
-		//get the list of Cinema from the cineplex
-		System.out.println("------------------------");
-		System.out.println("List movie of "+currentCineplex.getCineplexName()+"............");
-		for(int i = 0 ; i < currentCineplex.getMovieList().size() ; i++){
-			System.out.printf("%d) %s\n",i+1,currentCineplex.getMovieList().get(i).getTitle());
-		}
-		System.out.println("------------------------");
-		System.out.println("\nPlease choose one movie to configure\n");
-		
-		currentMovie = currentCineplex.getMovie(scan.nextInt());
-		
-		//get the movie to configure
-		//give option to add movie or update the movie
-		while(true){
-			System.out.println("------------------------------------------------------------");
-			System.out.println("Choose the option here:");
-			System.out.println("1) Add Movie to "+currentCinema.getNameCinema());
-			System.out.println("2) Update the movie from "+currentCinema.getNameCinema());
-			System.out.println("3) See the movie list and Holiday schedule of "+currentCinema.getNameCinema());
-			System.out.println("4) Add or Remove holiday to "+currentCineplex.getCineplexName());
-			System.out.println("5) Quit and choose another cinema or cineplex to configure");
-			System.out.println("------------------------------------------------------------");
-			int OptionMovie = scan.nextInt();
-			if(OptionMovie == 1){
-				addMovie();
-			}else if(OptionMovie == 2){
-				System.out.println("List of Movie from \n"+currentCinema.getNameCinema());
-				for(int i = 0 ; i < currentCinema.getArrayMovie().size() ; i++){
-					System.out.printf("%d) %s\n",i+1,currentCinema.getArrayMovie().get(i).printDescription());
-				}
-				if(currentCinema.getArrayMovie().size() != 0 ){
-					System.out.println("\nplease choose one movie to configure");
-					Movie chooseMovie = currentCinema.getMovieWithIndex(scan.nextInt()-1);
-					//later need to add the Date attribute so it will detect current time and the time when you put the object
-					System.out.println("What description you want to configure");
-					System.out.println("1) title");
-					System.out.println("2) duration");
-					System.out.println("3) ratingPG");
-					System.out.println("4) Genre");
-					System.out.println("5) date and status");
-					System.out.println("6) price");
-					
-					int MovieConfigurationDescription = scan.nextInt();
-					System.out.flush();
-					switch(MovieConfigurationDescription){
-						case 1:
-							System.out.println("insert the new title");
-							String newTitle = scan.nextLine();
-							chooseMovie.setTitle(newTitle);
-							break;
-						case 2:
-							System.out.flush();
-							System.out.println("insert the new duration");
-							String newDuration = scan.nextLine();
-							chooseMovie.setDuration(newDuration);
-							break;
-						case 3:
-							System.out.flush();
-							System.out.println("Set the new RatingPG");
-							String newRatingPG = scan.nextLine();
-							chooseMovie.setRatingPG(newRatingPG);
-							break;
-						case 4:
-							System.out.flush();
-							System.out.println("Set the new Genre of the movie");
-							String newGenre = scan.nextLine();
-							chooseMovie.setGenre(newGenre);
-							break;
-						case 5:
-							//getting the list of date on the currentMovie
-							System.out.flush();
-							System.out.println("Please choose one option");
-							System.out.println("1) Add another date");
-							System.out.println("2) editing the existing date");
-							int addDate = scan.nextInt();
-							if(addDate == 1){
-								setNewDateOfMovie(chooseMovie);
-							}else if(addDate == 2){
-								System.out.println("Schedule "+chooseMovie.getTitle()+" :");
-								chooseMovie.getListDateStatusMovie();
-								System.out.println("\n");
-								ArrayList<DateMovie> listMovie = chooseMovie.getArrayListOfDateMovie();
-								System.out.println("Please choose which date you want to configure");
-								int indexListMovie = scan.nextInt();
-								DateMovie currentDate = listMovie.get(indexListMovie-1);
-								System.out.println("\nPlease choose which one you want to configure");
-								System.out.println("1) Time");
-								System.out.println("2) status");
-								int timestatus = scan.nextInt();
-								if(timestatus == 1){
-									editTime(currentDate);
-								}else if(timestatus == 2){
-									System.out.println("insert the new Status");
-									scan.nextLine();
-									String newStatus = scan.nextLine();
-									currentDate.setStatus(newStatus);
-								}else{
-									System.out.println("Sorry your choice is ont in the system");
-									return ;
-								}
-							}
-							break; 
-						case 6:
-							System.out.println("insert the new price of the movie");
-							double price = scan.nextDouble();
-							chooseMovie.setPrice(price);
-							break;
-					}
-						System.out.println("Changes has been saved to our system\n");
-				}else{
-					System.out.println("\nDont have any movie on the list, please add at least one of the movie to the cinema");
-				}
-		}else if(OptionMovie == 3){
-			//see the movie List
-			if(currentCinema.getArrayMovie().size() != 0 ){
-				for(int i = 0; i < currentCinema.getArrayMovie().size() ; i++){
-					System.out.println(currentCinema.getArrayMovie().get(i).printDescription());
-				}
-			}else{
-				System.out.println("There has no movie in the "+currentCinema.getNameCinema());
-			}
-			String holidayDate = "Schedule Holiday on "+currentCineplex.getCineplexName()+":\n";
-			
-			if(currentCineplex.holidayList.size() > 0 ){
-				for(int i = 0 ; i < currentCineplex.holidayList.size() ; i++){
-					holidayDate += currentCineplex.holidayList.get(i).getYearMonthDay()+"\n";
-				}
-			}else{
-				holidayDate += "Dont have any holiday";
-			}
-			System.out.println(holidayDate+"\n");
-			System.out.println("\n");
-			
-		}else if(OptionMovie == 4){
-			System.out.println("1) Add Holiday");
-			System.out.println("2) Remove Holiday");
-			int holidayOption = scan.nextInt();
-			if(holidayOption == 1){
-				System.out.println("please specify ");
-				System.out.print("Year: ");
-				int holidayYear = scan.nextInt();
-				System.out.print("Month: ");
-				int holidayMonth = scan.nextInt();
-				System.out.print("Day: ");
-				int holidayDay = scan.nextInt();
-				DateMovie holidayDate  = new DateMovie(holidayYear,holidayMonth,holidayDay);
-				System.out.println("Holiday on "+holidayDate.getYearMonthDay()+" has been set");
-				currentCineplex.holidayList.add(holidayDate);
-			}else{
-				System.out.println("Holiday schedule of "+currentCineplex.getCineplexName());
-				for(int i = 0 ; i < currentCineplex.holidayList.size() ; i++){
-					System.out.printf("%d) %s",i+1,currentCineplex.holidayList.get(i).getYearMonthDay());
-				}
-				System.out.println("\nwhich holiday date you want to remove\n");
-				int removeHoliday = scan.nextInt();
-				currentCineplex.holidayList.remove(removeHoliday-1);
-				System.out.println("changes has been saved to the system\n");
-			}
-		}
-		else{
-			System.out.println("\n1) quit");
-			System.out.println("2) configure another cineplex");
-			System.out.println("3) configure another cinema in "+currentCineplex.getCineplexName());
-			System.out.println("Please choose the above options");
-			int Quit  = scan.nextInt();
-			if(Quit == 1){
-				System.out.println("Quit process");
-				return;
-			}else if(Quit ==2){
-				ViewCinemaFromDatabase();
-			}else if(Quit == 3){
-				Configuring();
-			}else{
-				System.out.println("Sorry your choices is not listed in our system");
-				System.out.println("Quit process\n");
-				return ;
-			}
-		}
-		cDatabase.writeToDatabase("CineplexDatabase.dat",cineplexList);
-		
-		}
-	
-	}
-	
-	private static void setNewDateOfMovie(Movie chooseMovie){
-		System.out.println("insert the new date with format");
-		System.out.println("YYYY MM DD HH mm");
-		int year = scan.nextInt();
-		int month = scan.nextInt();
-		int day = scan.nextInt();
-		int hour = scan.nextInt();
-		int minute = scan.nextInt();
-		DateMovie datemovie = new DateMovie(year, month, day, hour, minute);
-		//check the date whether it is holiday or not
-		DateMovie checkHolidayDate = new DateMovie(year,month,day);
-		for(int i = 0 ; i< currentCineplex.holidayList.size() ; i++){
-			if(checkHolidayDate.getYearMonthDay().equals(currentCineplex.holidayList.get(i).getYearMonthDay())){
-				System.out.println("Sorry your new added date is on holiday");
-				System.out.println("please specify another date");
-				setNewDateOfMovie(chooseMovie);
-				break;
-			}
-		}
-		System.out.println("Please add status to this new Date "+datemovie.getTime());
-		scan.nextLine();
-		String newStatus = scan.nextLine();
-		datemovie.setStatus(newStatus);
-		System.out.println("\nYour change has been saved to our system\n");
-		chooseMovie.setTimeStatus(datemovie);
-	}
-	
-	
-	private static void addMovie(){
-		//get the description of the movie from user
-		String title,duration,genre,status,ratingPG;
-		DateMovie dateMovie;
-		double price;
-		int year,month,day,hour,minute;
-		scan.nextLine();
-		System.out.println("insert the title of new movie");
-		title = scan.nextLine();
-		System.out.println("insert the duration of new movie");
-		duration = scan.nextLine();
-		System.out.println("insert the genre of the new movie");
-		genre = scan.nextLine();
-		System.out.println("insert the RatingPG");
-		ratingPG = scan.nextLine();
-		System.out.println("insert the price of the movie");
-		price = scan.nextDouble();
-		System.out.println("insert the date with format");
-		System.out.println("YYYY MM DD HH mm");
-		year = scan.nextInt();
-		month = scan.nextInt();
-		day = scan.nextInt();
-		hour = scan.nextInt();
-		minute = scan.nextInt();
-		scan.nextLine();
-		System.out.println("insert the status of the movie on that time");
-		status = scan.nextLine();
-		dateMovie = new DateMovie(status,year, month, day, hour, minute);
-		Movie movie = new Movie(title, duration, ratingPG, genre, dateMovie,price);
-		currentCinema.AddListOfMovie(movie);
-		System.out.println("Changes has been saved to our system\n");
-	
-	}
-	
-	
-	private static void editTime(DateMovie currentDate){
-		
-		System.out.println("Please choose which part of date you want to edit");
-		System.out.println("1) Year");
-		System.out.println("2) Month");
-		System.out.println("3) Day");
-		System.out.println("4) Hour");
-		System.out.println("5) Minute");
-		System.out.println("6) Status");
-		int DateEditPart = scan.nextInt();
-		switch(DateEditPart){
-		case 1:
-			System.out.printf("year: ");
-			int newYear = scan.nextInt();
-			currentDate.setYear(newYear);
-			break;
-		case 2:
-			System.out.println("Month: ");
-			int newMonth = scan.nextInt();
-			currentDate.setMinute(newMonth);
-			break;
-		case 3:
-			System.out.printf("Day: ");
-			int newDay = scan.nextInt();
-			currentDate.setDay(newDay);
-			break;
-		case 4:
-			System.out.printf("Hour: ");
-			int newHour = scan.nextInt();
-			currentDate.setHour(newHour);
-			break;
-		case 5:
-			System.out.printf("Minute: ");
-			int newMinute = scan.nextInt();
-			currentDate.setMinute(newMinute);
-			break;
-		case 6:
-			System.out.println("Sorry your choices is not listed in our system");
-			System.out.println("1) Edit DateMovie again");
-			System.out.println("2) Quit");
-			
-			int choice = scan.nextInt();
-			if(choice == 1){
-				editTime(currentDate);
-			}else{
-				return ;
-			}
-			break;
-		
-		}
-		
-	}
-	
-	*/
 }
