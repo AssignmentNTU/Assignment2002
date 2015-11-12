@@ -1,6 +1,7 @@
 package Movie;
 
 import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class RatedMovie implements Serializable{
@@ -28,9 +29,16 @@ public class RatedMovie implements Serializable{
 		return listMovieRated;
 	}
 	
-	public void removeMovie(Movie movie){
-		listMovieRated.remove(movie);
+	public void removeMovie(String nameMovie){
+		for(int i = 0 ; i < listMovieRated.size() ;i++){
+			if(listMovieRated.get(i).getTitle().equals(nameMovie)){
+				listMovieRated.remove(i);
+				break;
+			}
+		}
 	}
+	
+
 	
 	public Movie getMovieWithIndex(int index){
 		return listMovieRated.get(index);
@@ -53,6 +61,15 @@ public class RatedMovie implements Serializable{
 			}
 		}
 		
+	}
+	
+	public void updateMovieReview(String user,String review,int indexMovie){
+		String reviewText = listMovieRated.get(indexMovie).getReview();
+		reviewText+="Name: "+user+"\n";
+		reviewText+=review+"\n";
+		reviewText+="\n-------------------------------------------\n";
+		Movie movie = listMovieRated.get(indexMovie);
+		movie.setReview(reviewText);
 	}
 
 	public void printTopFiveMovieBasedOnTicket(){
@@ -94,8 +111,33 @@ public class RatedMovie implements Serializable{
 		
 		System.out.println(listMovieRated.size());
 		for(int i = 0 ; i< listMovieRated.size() ;i++){
+			if(listMovieRated.get(i).getCounterRating() > 1){
+				System.out.println(i+1+")"+"Title: "+listMovieRated.get(i).getTitle()+", Rating: "+new DecimalFormat("#.#").format(listMovieRated.get(i).getRating()));
+			}else{
+				System.out.println(i+1+")"+"Title: "+listMovieRated.get(i).getTitle()+", Rating: NA");
+			}
+			
+			}
+			
+	}
+	
+	
+	public void printMovieList(){
+		for(int i = 0 ; i< listMovieRated.size() ;i++){
 			System.out.println(i+1+")"+"Title: "+listMovieRated.get(i).getTitle()+", Rating: "+listMovieRated.get(i).getRating());
 		}
+	}
+	
+	public void printNormalMovieList(){
+		for(int i = 0 ; i< listMovieRated.size() ;i++){
+			System.out.println(i+1+")"+"Title: "+listMovieRated.get(i).getTitle());
+		}
+	}
+	
+	public void printReview(int index){
+		System.out.println("Title: "+listMovieRated.get(index).getTitle());
+		System.out.println(listMovieRated.get(index).getReview());
+		
 	}
 	
 }
