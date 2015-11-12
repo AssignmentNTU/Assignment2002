@@ -1,143 +1,91 @@
 package Movie;
 
-import java.io.Serializable;
-import java.text.DecimalFormat;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Scanner;
 
-public class RatedMovie implements Serializable{
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private String movieTitle;	
-	private double rating;
-	private ArrayList<Movie> listMovieRated = new ArrayList<Movie>();
-	
-	//getter and setter for the listMovieRated
-	public void addMovieList(Movie movie){
-		//checking whether the movie has been in the list or not
-		for(int i = 0 ; i < listMovieRated.size() ; i++){
-			if(listMovieRated.get(i).getTitle().equals(movie.getTitle())){
-				return;
-			}
-		}
-		listMovieRated.add(movie);
-	}
-	
-	public ArrayList<Movie> getRatedMovie(){
-		return listMovieRated;
-	}
-	
-	public void removeMovie(String nameMovie){
-		for(int i = 0 ; i < listMovieRated.size() ;i++){
-			if(listMovieRated.get(i).getTitle().equals(nameMovie)){
-				listMovieRated.remove(i);
-				break;
-			}
-		}
-	}
-	
+import Interface.Database;
 
+public class RatedMovieDatabase implements Database{
 	
-	public Movie getMovieWithIndex(int index){
-		return listMovieRated.get(index);
+	public static void main(String[] args){
+		System.out.println("Start Constructing the original database for Rated Movie");
+		RatedMovieDatabase database = new RatedMovieDatabase();
+		String fileName = "RatedMovie.dat";
+		ArrayList listMovie = new ArrayList<RatedMovie>();
+		//example for movie rating 
+		Movie first = new Movie("The walk");
+		Movie second= new Movie("Last Witch Hunter");
+		Movie third = new Movie("Paranormal Activity The Ghost Dimension");
+		Movie fourth = new Movie("Goosebumps");
+		RatedMovie ratedmovie = new RatedMovie();
+		ratedmovie.addMovieList(first);
+		ratedmovie.addMovieList(second);
+		ratedmovie.addMovieList(third);
+		ratedmovie.addMovieList(fourth);
+		listMovie.add(ratedmovie);
+		database.writeToDatabase(fileName, listMovie);
+		System.out.println("Finish construction the original database for Rated Movie");
+		//after put it into the database try to read it
+		/*
+		while(true){
+			ArrayList readMovie = database.readFromDatabase(fileName);
+			RatedMovie ratedMovie = (RatedMovie) readMovie.get(0);
+			ArrayList<Movie> listMovieRated = ratedMovie.getRatedMovie();
+		
+			System.out.println("which one you want to rate:");
+			Scanner scan = new Scanner(System.in);
+			int index = scan.nextInt(); 
+			System.out.println("Add your rating here: ");
+			int rating = scan.nextInt();
+			ratedMovie.updateMovieRating(index-1, rating);
+			Movie test = ratedMovie.getMovieWithIndex(0);
+			RatedMovie ratedMovie1 = (RatedMovie) readMovie.get(0);
+			//System.out.println("name: "+ratedMovie1.getMovieWithIndex(0).getTitle()+" rating: "+ratedMovie1.getMovieWithIndex(0).getRating());
+			database.writeToDatabase(fileName, readMovie);
+		}
+		*/
 	}
 	
-	public void updateMovieRating(int index,double rating){
-		Movie movie = listMovieRated.get(index);
-		movie.setRating(rating);
-		//System.out.println("test rating: "+listMovieRated.get(index).getRating());
-	}
-	
-	public void updateMovieTicket(String movieName){
-		Movie bufferMovie = null;
-		for(int i = 0 ; i < listMovieRated.size() ; i++){
-			if(listMovieRated.get(i).getTitle().equals(movieName)){
-				bufferMovie = listMovieRated.get(i);
-				System.out.println("successFull");
-				bufferMovie.increaseTicket();
-				break;
-			}
+	@Override
+	public void writeToDatabase(String filename, ArrayList<Object> list) {
+		FileOutputStream fos = null;
+		BufferedOutputStream bos = null;
+		try{
+			fos = new FileOutputStream(filename);
+			bos = new BufferedOutputStream(fos);
+			ObjectOutputStream os = new ObjectOutputStream(bos);
+			os.writeObject(list);
+			os.close();
+		}catch(IOException e){
+			System.out.println(e.getMessage());
 		}
 		
 	}
-	
-	public void updateMovieReview(String user,String review,int indexMovie){
-		String reviewText = listMovieRated.get(indexMovie).getReview();
-		reviewText+="Name: "+user+"\n";
-		reviewText+=review+"\n";
-		reviewText+="\n-------------------------------------------\n";
-		Movie movie = listMovieRated.get(indexMovie);
-		movie.setReview(reviewText);
-	}
 
-	public void printTopFiveMovieBasedOnTicket(){
-		//insertion sort to sort the movie  
-		for(int i = 1 ; i < listMovieRated.size() ; i++){
-			for(int j = i ; j > 0 ;j--){
-				double first = listMovieRated.get(j-1).getTicketSales();
-				double second = listMovieRated.get(j).getTicketSales();
-				
-				if(first < second){
-					//perform swap process
-					Movie buffer = listMovieRated.get(j);
-					listMovieRated.set(j, listMovieRated.get(j-1));
-					listMovieRated.set(j-1,buffer);
-				}
-			}
-		}
-		for(int i = 0 ; i< listMovieRated.size() && i <5 ;i++){
-			System.out.println(i+1+")"+" Title: "+listMovieRated.get(i).getTitle()+" ticket: "+listMovieRated.get(i).getTicketSales());
-		}
-	}
-	
-	public void printTopFiveMovieBasedOnRating(){
-		//insertion sort to sort the movie  
-	
-		for(int i = 1 ; i < listMovieRated.size() ; i++){
-			for(int j = i ; j > 0 ;j--){
-				double first = listMovieRated.get(j-1).getRating();
-				double second = listMovieRated.get(j).getRating();
-				if(first < second){
-					//perform swap process
-					System.out.println("test");
-					Movie buffer = listMovieRated.get(j);
-					listMovieRated.set(j, listMovieRated.get(j-1));
-					listMovieRated.set(j-1,buffer);
-				}
-			}
-		}
-		
-		System.out.println(listMovieRated.size());
-		for(int i = 0 ; i< listMovieRated.size() ;i++){
-			if(listMovieRated.get(i).getCounterRating() > 1){
-				System.out.println(i+1+")"+"Title: "+listMovieRated.get(i).getTitle()+", Rating: "+new DecimalFormat("#.#").format(listMovieRated.get(i).getRating()));
-			}else{
-				System.out.println(i+1+")"+"Title: "+listMovieRated.get(i).getTitle()+", Rating: NA");
-			}
+	@Override
+	public ArrayList readFromDatabase(String filename) {
+		ArrayList returnedList = null;
+		FileInputStream fis = null;
+		BufferedInputStream bis = null;
+		try{
+			fis = new FileInputStream(filename);
+			bis = new BufferedInputStream(fis);
+			ObjectInputStream ois = new ObjectInputStream(bis);
+			returnedList = (ArrayList)ois.readObject();
+			ois.close();
+		}catch(IOException e){
 			
-			}
+		} catch (ClassNotFoundException e) {
 			
-	}
-	
-	
-	public void printMovieList(){
-		for(int i = 0 ; i< listMovieRated.size() ;i++){
-			System.out.println(i+1+")"+"Title: "+listMovieRated.get(i).getTitle()+", Rating: "+listMovieRated.get(i).getRating());
 		}
+		return returnedList;
 	}
-	
-	public void printNormalMovieList(){
-		for(int i = 0 ; i< listMovieRated.size() ;i++){
-			System.out.println(i+1+")"+"Title: "+listMovieRated.get(i).getTitle());
-		}
-	}
-	
-	public void printReview(int index){
-		System.out.println("Title: "+listMovieRated.get(index).getTitle());
-		System.out.println(listMovieRated.get(index).getReview());
-		
-	}
-	
+
 }
