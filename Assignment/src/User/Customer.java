@@ -28,6 +28,11 @@ public class Customer implements Serializable{
 		
 	}
 	
+	
+	public Customer(){
+		
+	}
+	
 	public String getName() {
 		
 		return name;
@@ -59,7 +64,7 @@ public class Customer implements Serializable{
 	}
 
 	public String getTransactionId(){
-		
+		transactionId="";
 		transactionId += name.substring(0,3).toUpperCase();
 		
 		DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmm");
