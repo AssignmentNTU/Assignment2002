@@ -2,7 +2,9 @@ package Movie;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Calendar;
+
+import Cinema.Cinema;
+import Cineplex.Cineplex;
 
 public class Movie implements Serializable{
 	
@@ -18,9 +20,15 @@ public class Movie implements Serializable{
 	private String synopsis = "";
 	private ArrayList<DateMovie> scheduleMovie = new ArrayList<DateMovie>();
 	private int totalTicketSales = 0 ;
+	private String review = "";
+	private static HolidayDataBase holidayDatabase = new HolidayDataBase();
+	@SuppressWarnings("unchecked")
+	private static ArrayList<DateMovie> listHoliday = holidayDatabase.readFromDatabase("HolidayDatabase.dat");
+	private String notificationMessage = "";
 	
 	
 	public static void main(String args[]){
+		/*
 		Movie movie = new Movie();
 		movie.setSynopsis("Twelve people have walked on the moon, but only one man has ever, or will ever, walk in"
 				+ " the immense void between the World Trade Center towers."
@@ -34,10 +42,16 @@ public class Movie implements Serializable{
 		movie.setCastList(list);
 		System.out.println(movie.printSynopsis());
 		System.out.println(movie.printCast());
+		*/
+		System.out.println(listHoliday.size());
 	}
 	//constrouctor for testing
 	public Movie(){
 		
+	}
+	
+	public Movie(String title){
+		this.title = title;
 	}
 	
 	public Movie(String title, float rating){
@@ -161,6 +175,16 @@ public class Movie implements Serializable{
 		return duration;
 	}
 	
+	//getter and setter for revliew
+	
+	public void setReview(String review){
+		this.review = review;
+	}
+	
+	public String getReview(){
+		return review;
+	}
+	
 	//getter and setter for rating 
 	
 	public void setRating(double rating){
@@ -175,7 +199,9 @@ public class Movie implements Serializable{
 	}
 	
 	
-	
+	public int getCounterRating(){
+		return this.counterRating;
+	}
 	
 	//getter and setter for genre
 	
@@ -211,18 +237,57 @@ public class Movie implements Serializable{
 		this.price = price;
 	}
 	
-	public double getPrice(int ageGroup){
-		switch (ageGroup){
+	public double getNormalPrice(){
+		return price;
+	}
+	
+	public void notificationMessage(){
+		System.out.println(notificationMessage);
+		notificationMessage= "";
+	}
+	
+	public double getPrice(int ageGroup,DateMovie dateMovie){
+		//get the cinema if the movie is played in the platinum teater the price will be increase by $5 
+		int increasePrice = 0;
+		Cinema cinemaChoosen = dateMovie.getCinema();
+		if(cinemaChoosen.getTheaterType().equals("Platinum")){
+			notificationMessage+="It is platinum cinema, the price will be increase by 5 dollars\n";
+			increasePrice += 5;
+		}
 		
+		//check the public holiday
+
+		DateMovie first = new DateMovie(dateMovie.getYear(),dateMovie.getMonth(),dateMovie.getDay());
+		for(int i = 0 ; i < listHoliday.size();i++){
+			if(first.getYear() == listHoliday.get(i).getYear() && first.getMonth() == listHoliday.get(i).getMonth() 
+					&& first.getDay() == listHoliday.get(i).getDay()){
+				notificationMessage+="It is public Holiday, the price will be increase by 2 dollars\n";
+				increasePrice+=2;
+				break;
+			}
+		}
+		
+		
+		//if the movie is 3D then the price will be increase too
+		if(this.genre.equals("3D")){
+			notificationMessage+="This movie is 3D movie, the price will be increase by 2 dollars\n";
+			increasePrice+=2;
+		}
+		
+		switch (ageGroup){
 			case 1:
+				break;
 			case 3:
-				price -= 2;
+				System.out.println("Senior citizen, the price will be reduced by 2 dollars");
+				increasePrice-=2;
 				break;
 			default: break;
 		
 		}
-		return price;
+		return price+increasePrice;
 	}
+	
+	
 	
 	
 	//getting array of dateMovie
@@ -258,10 +323,10 @@ public class Movie implements Serializable{
 	//without rating
 	public String printDescription(){
 		String movieDescription = "Title Movie: "+this.title+"\n"
-								   +"Duration: "+this.duration+ "\n"
+								   +"Duration: "+this.duration+" min\n"
 								   +"RatingPG: "+this.ratingPG+"\n"
 								   +"Genre: "+this.genre+"\n"
-								   +"Price: "+this.price+"\n"
+								   +"Price: "+"$"+this.price+"\n"
 								   +"Director: "+this.director+"\n"
 								   +"cast: \n"+printCast()+"\n"
 								   +"Synopsis: \n"+printSynopsis()+"\n"
@@ -310,5 +375,23 @@ public class Movie implements Serializable{
 		return movieDescription;
 	}
 
+	
+	public String printMovieListingUser(){
+		String movieDescription = "Title Movie: "+this.title+"\n"
+				   +"Duration: "+this.duration+" min\n"
+				   +"RatingPG: "+this.ratingPG+"\n"
+				   +"Genre: "+this.genre+"\n"
+				   +"Price: "+"$"+this.price+"\n"
+				   +"Director: "+this.director+"\n"
+				   +"cast: \n"+printCast()+"\n"
+				   +"Synopsis: \n"+printSynopsis()+"\n"
+				   +"Schedule Movie: \n\n";
+	
+	
+		return movieDescription;
+	}
+	
+	
+	
 	//////////////////////////////////
 }
