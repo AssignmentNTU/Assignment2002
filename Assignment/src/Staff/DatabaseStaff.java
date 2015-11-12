@@ -16,17 +16,19 @@ public class DatabaseStaff implements Database{
 	
 	
 	public static void main(String args[]){
+		System.out.println("Start constructing original database for User");
 		ArrayList list = new ArrayList<Staff>();
 		Staff newStaff = new Staff("EdwardSujono","12345");
 		list.add(newStaff);
 		String filename = "staff.dat";
 		DatabaseStaff dbs = new DatabaseStaff();
-		dbs.WriteToDatabase(filename, list);
+		dbs.writeToDatabase(filename, list);
+		System.out.println("Finish constructing original database for User");
 	}
 	
 
 	@Override
-	public void WriteToDatabase(String filename, ArrayList<Object> list) {
+	public void writeToDatabase(String filename, ArrayList<Object> list) {
 		FileOutputStream fos = null;
 		BufferedOutputStream bos = null;
 		try{
@@ -42,7 +44,7 @@ public class DatabaseStaff implements Database{
 
 
 	@Override
-	public ArrayList<Staff> ReadFromDatabase(String filename) {
+	public ArrayList<Staff> readFromDatabase(String filename) {
 		ArrayList returnedList = null;
 		FileInputStream fis = null;
 		BufferedInputStream bis = null;
